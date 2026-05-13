@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body{
+            background-color: black;
+            font-family: Arial, Helvetica, sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        .container{
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+
+        .img{
+            width: 100%;
+            height: 100vh;
+            position: absolute;
+        }
+
+        .img img{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .overlay{
+            width: 100%;
+            height: 100vh;
+            background-color: rgba(0,0,0,0.4);
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .quote{
+            position: absolute;
+            top: 70px;
+            left: 70px;
+            width: 500px;
+            z-index: 10;
+        }
+
+        .quote p{
+            font-size: 18px;
+            line-height: 32px;
+        }
+
+        .quote h3{
+            margin-top: 15px;
+            font-size: 18px;
+        }
+
+        .timeBox{
+            position: absolute;
+            top: 90px;
+            left: 200px;
+            z-index: 10;
+        }
+
+        .topText{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+        }
+
+        .topText img{
+            width: 24px;
+            height: 24px;
+        }
+
+        .clock{
+            display: flex;
+            align-items: end;
+        }
+
+        .clock h1{
+            font-size: 180px;
+        }
+
+        .clock span{
+            font-size: 40px;
+            margin-bottom: 35px;
+            margin-left: 15px;
+        }
+
+        .city{
+            margin-top: 10px;
+            letter-spacing: 4px;
+            font-size: 22px;
+        }
+
+        .info{
+            width: 100%;
+            height: 250px;
+            background-color: rgba(255,255,255,0.8);
+            position: absolute;
+            bottom: 0;
+            color: black;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            backdrop-filter: blur(10px);
+        }
+
+        .left h5,
+        .right h5{
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+
+        .left h1,
+        .right h1{
+            font-size: 50px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="img">
+            <img src="photo.jpg" alt="">
+        </div>
+
+        <div class="overlay"></div>
+
+        <div class="timeBox">
+
+            <div class="topText">
+                <img src="photo_1.jpg" alt="">
+                <h3 id="greeting">
+                    GOOD MORNING, IT’S CURRENTLY
+                </h3>
+            </div>
+
+            <div class="clock">
+                <h1 id="time"></h1>
+                <span id="zone">BST</span>
+            </div>
+
+            <h2 class="city" id="location">
+                IN LONDON, UK
+            </h2>
+
+        </div>
+
+        <div class="info">
+
+            <div class="left">
+                <h5>CURRENT TIMEZONE</h5>
+                <h1 id="timezone">Europe/London</h1>
+            </div>
+
+            <div class="right">
+                <h5>DAY OF THE YEAR</h5>
+                <h1 id="dayYear">295</h1>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+        const url = "https://timeapi.io/api/time/current/zone?timeZone=Europe/London";
+
+        const time = document.getElementById("time");
+        const zone = document.getElementById("zone");
+        const timezone = document.getElementById("timezone");
+        const dayYear = document.getElementById("dayYear");
+        const greeting = document.getElementById("greeting");
+
+        let hour;
+        let minute;
+        let second;
+
+        async function getTime(){
+
+            const response = await fetch(url);
+            const data = await response.json();
+
+            console.log(data);
+
+            hour = data.hour;
+            minute = data.minute;
+            second = data.seconds;
+
+            timezone.textContent = data.timeZone;
+
+            dayYear.textContent = data.dayOfYear;
+
+            zone.textContent = "BST";
+
+            updateClock();
+
+        }
+
+        function updateClock(){
+
+            second++;
+
+            if(second >= 60){
+                second = 0;
+                minute++;
+            }
+
+            if(minute >= 60){
+                minute = 0;
+                hour++;
+            }
+
+            if(hour >= 24){
+                hour = 0;
+            }
+
+            let newMinute = minute;
+            let newSecond = second;
+
+            if(newMinute < 10){
+                newMinute = "0" + newMinute;
+            }
+
+            if(newSecond < 10){
+                newSecond = "0" + newSecond;
+            }
+
+            time.textContent = `${hour}:${newMinute}:${newSecond}`;
+
+            if(hour >= 5 && hour < 18){
+                greeting.textContent = "GOOD MORNING, IT’S CURRENTLY";
+            }
+            else{
+                greeting.textContent = "GOOD EVENING, IT’S CURRENTLY";
+            }
+
+        }
+
+        getTime();
+
+        setInterval(() => {
+            updateClock();
+        }, 1000);
+    </script>
+</body>
+</html>
+
